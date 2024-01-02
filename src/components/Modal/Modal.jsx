@@ -1,32 +1,34 @@
-import { Component } from 'react';
+import { useEffect, useCallback } from 'react';
 import css from './Modal.module.css';
 
-export class Modal extends Component {
-  componentDidMount() {
-    window.addEventListener('keydown', this.escapeCloseModal);
-  }
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.escapeCloseModal);
-  }
+export const Modal = ({ largeImageURL, tags, onCloseModal }) => {
+  const escapeCloseModal = useCallback(
+    evt => {
+      if (evt.code === 'Escape') {
+        onCloseModal();
+      }
+    },
+    [onCloseModal]
+  );
 
-  escapeCloseModal = evt => {
-    if (evt.code === 'Escape') {
-      this.props.onCloseModal();
-    }
-  };
-
-  backdropCloseModal = evt => {
+  const backdropCloseModal = evt => {
     if (evt.target === evt.currentTarget) {
-      this.props.onCloseModal();
+      onCloseModal();
     }
   };
-  render() {
-    return (
-      <div onClick={this.backdropCloseModal} className={css.overlay}>
-        <div className={css.modal}>
-          <img src={this.props.largeImageURL} alt={this.props.tags} />
-        </div>
+
+  useEffect(() => {
+    window.addEventListener('keydown', escapeCloseModal);
+    return () => {
+      window.removeEventListener('keydown', escapeCloseModal);
+    };
+  }, [onCloseModal, escapeCloseModal]);
+
+  return (
+    <div onClick={backdropCloseModal} className={css.overlay}>
+      <div className={css.modal}>
+        <img src={largeImageURL} alt={tags} />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

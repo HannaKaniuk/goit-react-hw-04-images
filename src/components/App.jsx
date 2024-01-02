@@ -18,9 +18,8 @@ export const App = () => {
   const [theEndOfImages, setTheEndOfImages] = useState(false);
 
   useEffect(() => {
+    if (!query) return;
     const fetchData = async () => {
-      if (!query || page < 1) return;
-
       try {
         setShowLoader(true);
         const allImages = await fetchImages(query, page);
